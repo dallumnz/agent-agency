@@ -1,31 +1,53 @@
 # Agent Agency Architecture
 
-**Version:** 0.3.1
-**Status:** Working Toward 1.0-Alpha
-**Stack:** OpenCode + Laravel Boost MCP + Local LLMs (LMStudio) + RAG System
+**Version:** 0.4.0
+**Status:** Planning Phase
+**Stack:** OpenCode + Laravel Boost MCP + Local LLMs (LMStudio) + Project RAG
 
 ---
 
-## The Pivot: From Autonomous to Assistive
+## The Pivot: Embracing Ecosystem Tools
 
-### What Changed
+### What Changed (v0.4.0)
 
-| Before (v2.x) | After (v3.0) |
-|----------------|---------------|
-| Agents build complete apps | Agents scaffold, user implements |
-| Autonomous execution | Human-in-the-loop at key points |
-| Multiple specialist agents | Simplified agent roles |
-| Context as static files | Context as RAG-powered utility agent |
-| "Agent built this" | "I built this with agent assistance" |
+| Before (v0.3.x) | After (v0.4.0) |
+|------------------|-----------------|
+| Context-Manager as separate RAG agent | **Laravel Boost** provides Laravel context |
+| Custom Laravel conventions + patterns | Boost guidelines cover framework patterns |
+| Separate Project RAG for domain knowledge | **Project RAG** for app-specific knowledge |
+| Build context layer from scratch | Compose Boost + Project RAG |
 
-### Core Philosophy
+### Core Insight
 
-> **"Agents are tools, not magical beings."**
+> **"Don't own what others maintain better."**
 
-- Agents assist, they don't replace professional judgment
-- Quality over velocity — professional standards matter
-- Right tool for the job — sometimes that's you writing code
-- Scaffolding + implementation beats fully-generated slop
+- Laravel Boost handles framework literacy (kept updated by Laravel team)
+- Agent Agency focuses on orchestration + project-specific context
+- Compose, don't replicate
+
+---
+
+## Architecture Reframe
+
+```
+User Request
+    ↓
+Dev-Manager (orchestrates)
+    ├── Worker Agents (task execution)
+    ├── Laravel Boost MCP (framework context)
+    └── Project RAG (your app context)
+    ↓
+Result
+```
+
+**Layers of Context:**
+
+| Context Type | Provider | Purpose |
+|--------------|----------|---------|
+| Framework | Laravel Boost MCP | Laravel conventions, routes, schema, docs |
+| Ecosystem | Boost Guidelines | Livewire, Tailwind, Pest, Filament patterns |
+| Project | Project RAG | Your app's domain, patterns, business logic |
+| Task | Meta-Prompts | Agent-specific instructions |
 
 ---
 
@@ -35,28 +57,21 @@
 |-------|-------|-----------|----------|
 | **Dev-Manager** | qwen3-30b | Complex | Planning, coordination, meta-prompts |
 | **Fullstack-Dev** | qwen3-30b | Complex | Scaffold generation, testing |
-| **Context-Manager** | gpt-oss-20b | Fast | Lightweight context queries |
 | **Code-Reviewer** | gpt-oss-20b | Fast | Static analysis, reviews |
 
 **Rationale:**
 - **30B models** — Complex scaffolding, planning, multi-step reasoning
-- **20B model** — Faster, cheaper for lightweight tasks (context lookups, reviews)
+- **20B model** — Faster, cheaper for lightweight tasks (reviews)
 
 ---
 
-## Agent Team (v3.0)
+## Agent Team (v0.4.0)
 
 ### Orchestrator
 
 | Agent | Role | Model | Primary Function |
-|-------|------|-------|-------------------|
+|-------|------|-------|-----------------|
 | **Dev-Manager** | Team Lead | qwen3-30b | Planning, coordination, meta-prompts, sequential task execution |
-
-### Utility Agent
-
-| Agent | Role | Model | Primary Function |
-|-------|------|-------|-------------------|
-| **Context-Manager** | Knowledge Utility | gpt-oss-20b | Queries context files, returns to calling agent |
 
 ### Worker Agents (Scaffold → User Implements)
 
@@ -64,6 +79,48 @@
 |-------|------|-------|----------|
 | **Fullstack-Dev** | Scaffold Engineer | qwen3-30b | Migrations, models, controllers, routes, views, tests |
 | **Code-Reviewer** | Quality Assistant | gpt-oss-20b | Code review, static analysis, security |
+
+### Removed
+
+| Agent | Status | Reason |
+|-------|--------|--------|
+| **Context-Manager** | Removed | Replaced by Laravel Boost MCP + Project RAG |
+
+---
+
+## Context Integration
+
+### Laravel Boost MCP
+
+Fullstack-Dev uses Boost MCP tools for:
+
+| Tool | Purpose |
+|------|---------|
+| Schema inspection | Read database structure |
+| Route listing | Get current routes + middleware |
+| Migration generation | Create new migrations |
+| Documentation search | Query Laravel docs (17,000+ chunks) |
+| Pest integration | Generate test stubs |
+
+### Project RAG
+
+For your application's knowledge:
+
+```
+rag.py search "<query>"
+  ├── ~/projects/your-app/docs/
+  ├── ~/projects/your-app/README.md
+  └── Custom patterns + conventions
+```
+
+**Invocation:**
+
+```markdown
+@context-manager
+Query: "<app-specific context need>"
+Project: ~/projects/my-laravel-app
+Format: markdown
+```
 
 ---
 
@@ -81,7 +138,9 @@ For each task:
     ↓
     Spawn agent with meta-prompt
     ↓
-    Agent executes + reports feedback
+    Agent uses Boost MCP + Project RAG
+    ↓
+    Agent scaffolds + reports feedback
     ↓
     Dev-Manager incorporates feedback → adjusts next steps
     ↓
@@ -94,8 +153,9 @@ Consolidated report to user
 # Role
 You are [agent name], a [role description].
 
-# Context
-[Context from Context-Manager]
+# Context (from Boost + Project RAG)
+[Framework context from Boost MCP]
+[Project context from RAG]
 
 # Task
 [Specific task description]
@@ -110,130 +170,6 @@ You are [agent name], a [role description].
 
 # Previous Feedback
 [Any feedback from prior steps to incorporate]
-```
-
-### Sequential Task Execution
-
-1. **Analyze** → Understand request, detect pattern (MVC/API)
-2. **Plan** → Build step-by-step task list
-3. **Meta-Prompt** → Create agent prompt for each step
-4. **Execute** → Spawn agent, collect feedback
-5. **Iterate** → Adjust next steps based on feedback
-6. **Report** → Consolidate to user
-
----
-
-## Context-Manager Response Formats
-
-### Format Selection
-
-| Format | Use Case | Example |
-|--------|----------|---------|
-| **Markdown** | Agent context, conventions, patterns | Rich formatting, flexible, LLM-friendly |
-| **JSON** | Tool outputs, structured data, MCP integration | Precise, machine-parseable |
-
-### Response Pattern
-
-**For Agent Context (Markdown):**
-```markdown
-# Laravel Conventions
-
-## Naming
-- Models: Singular, PascalCase (User, BlogPost)
-- Controllers: Plural + Controller (UsersController)
-- Tables: Plural, snake_case (blog_posts)
-
-## Code Style
-- PSR-12 standards
-- Laravel facades for common operations
-```
-
-**For Tool Data (JSON):**
-```json
-{
-  "schema": {
-    "users": {
-      "id": "increments",
-      "name": "string",
-      "email": "string"
-    }
-  }
-}
-```
-
-### Invocation Pattern
-
-```markdown
-@context-manager
-Query: "<specific question or context need>"
-Project: <project path>
-Format: <markdown | json>
-```
-
----
-
-## Workflow Pattern
-
-### High-Level Flow
-
-```
-Dallum + Dev-Manager
-    ↓
-Dev-Manager (sequential plan + meta-prompts)
-    ↓
-For each task:
-    Spawn agent with meta-prompt
-    ↓
-    Agent calls Context-Manager FIRST (mandatory)
-    ↓
-    Agent scaffolds + reports feedback
-    ↓
-    Dev-Manager adjusts next steps
-    ↓
-Consolidated report to user
-    ↓
-User reviews + implements business logic
-```
-
-### Detailed Sequence
-
-```
-1. REQUEST
-   User describes task to Dev-Manager
-
-2. PLAN
-   Dev-Manager analyzes request
-   Builds sequential task list
-   Creates meta-prompts for each agent
-
-3. SPAWN
-   Dev-Manager spawns agent with meta-prompt
-   Example: "Scaffold user authentication module"
-
-4. CONTEXT PULL (Mandatory)
-   Worker agent calls Context-Manager
-   Context-Manager returns context (Markdown)
-   Worker agent proceeds with task
-
-5. SCAFFOLD
-   Fullstack-Dev generates:
-   - Migrations, models, controllers
-   - Routes, views, components
-   - Feature/unit tests (via Laravel Boost Pest)
-
-6. FEEDBACK LOOP
-   Agent returns scaffold report to Dev-Manager
-   Dev-Manager incorporates feedback
-   Adjusts next tasks if needed
-
-7. CONSOLIDATE
-   Dev-Manager collects all outputs
-   Provides clear summary to user
-
-8. REVIEW + IMPLEMENT
-   User reviews scaffold
-   Fills in business logic
-   Refines to professional standard
 ```
 
 ---
@@ -266,13 +202,12 @@ Single agent benefits:
 ### Laravel Boost Pest Integration
 
 ```bash
-# Install Laravel Boost (has Pest skill)
-npx clawhub@latest install laravel-boost
-
-# Set OpenCode permissions for MCP access
+# Install Laravel Boost
+composer require laravel/boost --dev
+php artisan boost:install
 ```
 
-Fullstack-Dev uses Laravel Boost MCP to:
+Fullstack-Dev uses Boost MCP to:
 - Read database schema
 - Generate migrations
 - Create Pest test stubs
@@ -291,59 +226,83 @@ Fullstack-Dev uses Laravel Boost MCP to:
 ### Entry Point
 
 ```markdown
-@context-manager
-Query: "Laravel code review checklist, security concerns"
-Project: ~/projects/my-laravel-app
-Format: markdown
----
+@code-reviewer
 Files to review: [list]
 Focus: [security | performance | style | all]
 ```
 
 ---
 
-## Context-Manager Agent (v3.0)
+## Workflow Pattern
 
-### Purpose
+### High-Level Flow
 
-Transform static context files into an intelligent utility that:
-1. Receives queries from worker agents
-2. Returns relevant context in appropriate format
-3. Supports both agent consumption (Markdown) and tools (JSON)
-
-### Invocation Pattern
-
-```markdown
-@context-manager
-Query: "<specific question or context need>"
-Project: <project path>
-Format: <markdown | json>
+```
+User Request
+    ↓
+Dev-Manager (sequential plan + meta-prompts)
+    ↓
+For each task:
+    Spawn agent with meta-prompt
+    ↓
+    Agent queries Boost MCP (framework)
+    ↓
+    Agent queries Project RAG (domain)
+    ↓
+    Agent scaffolds + reports feedback
+    ↓
+    Dev-Manager adjusts next steps
+    ↓
+Consolidated report to user
+    ↓
+User reviews + implements business logic
 ```
 
-### Example Calls
+### Detailed Sequence
 
-**Fullstack-Dev starting:**
-```markdown
-@context-manager
-Query: "Laravel conventions for authentication modules, current project structure"
-Project: ~/projects/my-laravel-app
-Format: markdown
 ```
+1. REQUEST
+   User describes task to Dev-Manager
 
-**Code-Reviewer:**
-```markdown
-@context-manager
-Query: "Laravel code review checklist, security concerns"
-Project: ~/projects/my-laravel-app
-Format: markdown
-```
+2. PLAN
+   Dev-Manager analyzes request
+   Builds sequential task list
+   Creates meta-prompts for each agent
 
-**Laravel Boost query:**
-```markdown
-@context-manager
-Query: "Get current database schema for users table"
-Project: ~/projects/my-laravel-app
-Format: json
+3. SPAWN
+   Dev-Manager spawns agent with meta-prompt
+   Example: "Scaffold blog post module"
+
+4. CONTEXT PULL (via Boost + Project RAG)
+   Agent uses Boost MCP for:
+   - Current schema
+   - Route definitions
+   - Laravel documentation
+   
+   Agent queries Project RAG for:
+   - App-specific conventions
+   - Domain patterns
+   - Existing implementations
+
+5. SCAFFOLD
+   Fullstack-Dev generates:
+   - Migrations, models, controllers
+   - Routes, views, components
+   - Feature/unit tests (via Boost Pest)
+
+6. FEEDBACK LOOP
+   Agent returns scaffold report to Dev-Manager
+   Dev-Manager incorporates feedback
+   Adjusts next tasks if needed
+
+7. CONSOLIDATE
+   Dev-Manager collects all outputs
+   Provides clear summary to user
+
+8. REVIEW + IMPLEMENT
+   User reviews scaffold
+   Fills in business logic
+   Refines to professional standard
 ```
 
 ---
@@ -355,28 +314,11 @@ Format: json
 | Component | Description | User Implements |
 |-----------|-------------|-----------------|
 | **Migrations** | Database tables, columns, indexes | Business logic, relationships |
-| **Models** | Class structure, relationships, accessors | Custom attributes, complex logic |
+| **Models** | Class structure, relationships | Custom attributes, complex logic |
 | **Controllers** | CRUD methods, request validation | Business rules, complex operations |
 | **Routes** | Route definitions, group structure | Route middleware custom logic |
-| **Views/Components** | Blade files, Livewire components | UI customization, content |
+| **Views/Components** | Blade files, Livewire | UI customization, content |
 | **Tests** | Feature + Unit test stubs (Pest) | Test data, edge cases, assertions |
-
-### Example: Authentication Module
-
-**Agent scaffolds:**
-- `database/migrations/*_create_users_table.php`
-- `app/Models/User.php` (basic structure)
-- `app/Http/Controllers/AuthController.php` (stub methods)
-- `routes/auth.php` (basic routes)
-- `resources/views/auth/login.blade.php` (form template)
-- `tests/Feature/AuthTest.php` (Pest stubs)
-
-**User implements:**
-- Validation rules in controllers
-- Custom accessor/mutator logic
-- Complex relationships
-- Middleware customization
-- Actual test assertions and data
 
 ---
 
@@ -403,15 +345,82 @@ Format: json
 
 ---
 
+## Project RAG: Your App's Knowledge
+
+### Purpose
+
+Boost provides Laravel literacy. Project RAG provides **your application's** literacy:
+
+```
+What Project RAG Contains:
+├── ~/projects/your-app/docs/
+│   ├── architecture.md
+│   ├── patterns.md
+│   └── conventions.md
+├── README.md
+├── existing implementations
+└── domain-specific patterns
+```
+
+### Invocation
+
+```bash
+# CLI usage
+python ~/projects/agent-agency/rag/rag.py search "authentication patterns"
+
+# In agent prompt
+Context from Project RAG: [results from query]
+```
+
+### Integration Strategy
+
+1. Index project docs during setup
+2. Agent queries RAG on context pull
+3. Results merged with Boost context
+4. Both inform scaffolding decisions
+
+---
+
+## Laravel RAG Exploration (Future)
+
+### Concept
+
+Build a Laravel RAG package that provides:
+
+- Project documentation search
+- Custom embedding pipeline
+- Artisan commands for indexing
+- MCP-compatible interface
+
+### Scope (v0.5.0+)
+
+```
+laravel-rag/
+├── src/
+│   ├── Commands/
+│   │   ├── IndexCommand.php
+│   │   └── SearchCommand.php
+│   ├── Embedding/
+│   │   └── EmbeddingService.php
+│   └── RagServiceProvider.php
+├── config/
+│   └── laravel-rag.php
+└── composer.json
+```
+
+This complements Boost — Boost handles Laravel docs, Laravel RAG handles your app docs.
+
+---
+
 ## Success Metrics
 
-| Metric | Before (v2.x) | After (v3.0) |
-|--------|----------------|---------------|
-| Completion rate | "Agent built X" | "I built X with agent help" |
-| Code quality | Variable | Professional standard |
-| Testing | Minimal | Consistent test coverage (Pest) |
-| Review process | Agent-only | Human-in-the-loop |
-| Learning | Agent-dependent | Agent-assisted |
+| Metric | Target |
+|--------|--------|
+| Completion rate | "I built this with agent assistance" |
+| Code quality | Professional standard |
+| Testing | Consistent test coverage (Pest) |
+| Review process | Human-in-the-loop |
+| Learning | Agent-assisted, not agent-dependent |
 
 ### Target Outcomes
 
@@ -424,19 +433,6 @@ Format: json
 
 ---
 
-## Open Questions (Resolved)
-
-| Question | Decision |
-|----------|----------|
-| Model selection | qwen3-30b for complex, gpt-oss-20b for lightweight |
-| Dev-Manager planning | Sequential tasks + meta-prompts |
-| Fullstack agent | Combined (not backend + frontend separate) |
-| Context response | Markdown for agents, JSON for tools |
-| Testing | Fullstack-Dev creates tests via Laravel Boost Pest |
-| Review consolidation | Dev-Manager consolidates all outputs |
-
----
-
 ## Project Structure
 
 ```
@@ -444,50 +440,26 @@ agent-agency/
 ├── .opencode/
 │   └── agents/
 │       ├── development-manager.md    # Orchestrator with meta-prompts
-│       ├── context-manager.md        # RAG utility agent
 │       ├── fullstack-dev.md          # Scaffold engineer + testing
-│       └── code-reviewer.md          # Quality assistant
-├── contexts/
-│   └── (indexed to RAG corpus)
+│       └── code-reviewer.md           # Quality assistant
+├── rag/
+│   ├── rag.py                        # CLI interface (project RAG)
+│   └── README.md                      # RAG documentation
+├── laravel-rag/                       # Future: Laravel RAG package
 ├── docs/
-│   ├── laravel-boost-integration.md
 │   └── workflow.md
 ├── ideas/
 │   ├── current/
 │   └── future/
-├── rag/
-│   ├── corpus.db                    # RAG database
-│   ├── rag.py                       # CLI interface
-│   └── README.md                    # RAG documentation
-└── ARCHITECTURE.md                  # This file
+└── ARCHITECTURE.md                    # This file
 ```
-
----
-
-## RAG System Reference
-
-### Current State
-
-| Component | Value |
-|-----------|-------|
-| Database | ~/projects/agent-research/rag/corpus.db |
-| Indexed Chunks | 125+ |
-| Embedding Model | text-embedding-nomic-embed-text-v1.5 |
-| CLI Commands | list, stats, search "<query>" |
-
-### Integration Plan
-
-1. Context-Manager agent receives query
-2. Agent executes `python rag.py search "<query>"`
-3. Results returned in requested format (Markdown/JSON)
-4. Agent incorporates into scaffolding
 
 ---
 
 ## Dependencies
 
 ### MCP Servers
-- **Laravel Boost** — Schema, routes, migrations, Pest testing
+- **Laravel Boost** — Schema, routes, migrations, Pest testing, documentation
 - **Filesystem** — Project access
 
 ### Local Tools
@@ -500,6 +472,7 @@ agent-agency/
 
 | Version | Date | Description |
 |---------|------|-------------|
+| 0.4.0 | 2026-02-07 | Dropped Context-Manager, embraced Laravel Boost, added Project RAG |
 | 0.3.1 | 2026-02-05 | Model stack: qwen3-30b + gpt-oss-20b, meta-prompts, combined Fullstack-Dev |
 | 0.3.0 | 2026-02-04 | Pivot to assistive, RAG-powered Context-Manager |
 | 0.2.0 | 2026-02-02 | Task graphs, Debug-Agent, file-based context |
@@ -509,30 +482,21 @@ agent-agency/
 
 ## Next Steps
 
-1. [ ] Build Dev-Manager with meta-prompts + sequential planning
-2. [ ] Build Context-Manager with Markdown/JSON response formats
-3. [ ] Build Fullstack-Dev with Pest testing via Laravel Boost
-4. [ ] Build Code-Reviewer for static analysis
-5. [ ] Test workflow with sample Laravel feature
+1. [ ] Update agent definitions (remove Context-Manager)
+2. [ ] Define Project RAG indexing strategy
+3. [ ] Prototype Dev-Manager with meta-prompts
+4. [ ] Test Fullstack-Dev with Boost MCP integration
+5. [ ] Explore Laravel RAG package idea
 
 ---
 
 ## Documentation Plan
 
-### Pending Updates
-
 | Document | Status | Description |
 |----------|--------|-------------|
-| `docs/laravel-boost-integration.md` | Update | Add Pest testing integration |
-| `docs/workflow.md` | Rewrite | v0.3.1 workflow with meta-prompts |
-
-### New Documentation
-
-| Document | Purpose |
-|----------|---------|
-| `docs/context-manager.md` | Markdown/JSON response patterns |
-| `docs/scaffolding-patterns.md` | Fullstack-Dev scaffold scope |
-| `docs/meta-prompt-guide.md` | Dev-Manager meta-prompt structure |
+| `docs/workflow.md` | Rewrite | v0.4.0 workflow with Boost + Project RAG |
+| `docs/project-rag.md` | New | Project RAG indexing + usage |
+| `docs/laravel-rag.md` | Future | Laravel RAG package specification |
 
 ---
 
