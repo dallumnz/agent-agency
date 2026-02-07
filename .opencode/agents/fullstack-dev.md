@@ -1,7 +1,7 @@
 ---
 description: Fullstack Laravel developer that scaffolds migrations, models, controllers, routes, views, and Pest tests using Laravel Boost MCP.
 mode: subagent
-model: lmstudio/qwen3-30b-a3b-instruct-q4km-autoround
+model: lmstudio/qwen/qwen3-coder-30b
 temperature: 0.4
 tools:
   Read: true

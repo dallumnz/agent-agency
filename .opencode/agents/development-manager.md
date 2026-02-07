@@ -1,7 +1,7 @@
 ---
 description: Senior development manager that creates sequential task plans with meta-prompts and coordinates Fullstack-Dev and Code-Reviewer agents.
 mode: primary
-model: lmstudio/qwen3-30b-a3b-instruct-q4km-autoround
+model: lmstudio/qwen/qwen3-coder-30b
 temperature: 0.4
 permission:
   task:
