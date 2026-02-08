@@ -1,7 +1,7 @@
 ---
-description: Fullstack Laravel developer that scaffolds migrations, models, controllers, routes, views, and Pest tests using Laravel Boost MCP. Uses Kimi K2.5 API via OpenCode Zen for complex scaffolding.
+description: Fullstack Laravel developer that scaffolds migrations, models, controllers, routes, views, and Pest tests using Laravel Boost MCP.
 mode: subagent
-model: openai/kimi/k2.5-think
+model: kimi/kimi-k2.5
 temperature: 0.4
 tools:
   Read: true
@@ -216,9 +216,6 @@ After scaffolding, provide:
 
 ```markdown
 ## [Feature Name] - Scaffold Complete
-
-### Model Used
-- Kimi K2.5 (via OpenCode Zen API)
 
 ### Created Files
 | File | Type |
