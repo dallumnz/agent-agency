@@ -1,7 +1,7 @@
 ---
 description: Fullstack Laravel developer that scaffolds migrations, models, controllers, routes, views, and Pest tests using Laravel Boost MCP.
 mode: subagent
-model: kimi/kimi-k2.5
+model: kimi-k2.5
 temperature: 0.4
 tools:
   Read: true
