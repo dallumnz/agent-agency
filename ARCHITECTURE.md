@@ -1,8 +1,8 @@
 # Agent Agency Architecture
 
-**Version:** 0.4.0
-**Status:** Planning Phase
-**Stack:** OpenCode + Laravel Boost MCP + Local LLMs (LMStudio) + Project RAG
+**Version:** 0.4.2
+**Status:** In Progress
+**Stack:** OpenCode + Laravel Boost MCP + Hybrid LLMs (Local + Kimi K2.5)
 
 ---
 
@@ -13,78 +13,97 @@
 | Before (v0.3.x) | After (v0.4.0) |
 |------------------|-----------------|
 | Context-Manager as separate RAG agent | **Laravel Boost** provides Laravel context |
-| Custom Laravel conventions + patterns | Boost guidelines cover framework patterns |
-| Separate Project RAG for domain knowledge | **Project RAG** for app-specific knowledge |
-| Build context layer from scratch | Compose Boost + Project RAG |
+| Custom Laravel conventions + patterns | **Boost Guidelines** cover framework patterns |
+| Separate Project RAG | **Removed** (not needed) |
+| Build context layer from scratch | Use Boost MCP + Guidelines |
 
 ### Core Insight
 
 > **"Don't own what others maintain better."**
 
 - Laravel Boost handles framework literacy (kept updated by Laravel team)
-- Agent Agency focuses on orchestration + project-specific context
+- Boost Guidelines cover ecosystem patterns (Livewire, Tailwind, Pest, Filament)
+- Agent Agency focuses on orchestration
 - Compose, don't replicate
 
 ---
 
-## Architecture Reframe
+## Architecture Reframe (v0.4.2 - Hybrid)
 
 ```
 User Request
     ↓
-Dev-Manager (orchestrates)
+Dev-Manager (orchestrates, local reasoning)
     ├── Worker Agents (task execution)
-    ├── Laravel Boost MCP (framework context)
-    └── Project RAG (your app context)
+    └── Laravel Boost MCP + Guidelines (framework context)
     ↓
 Result
 ```
 
-**Layers of Context:**
+### Hybrid Model Strategy
 
-| Context Type | Provider | Purpose |
-|--------------|----------|---------|
-| Framework | Laravel Boost MCP | Laravel conventions, routes, schema, docs |
-| Ecosystem | Boost Guidelines | Livewire, Tailwind, Pest, Filament patterns |
-| Project | Project RAG | Your app's domain, patterns, business logic |
-| Task | Meta-Prompts | Agent-specific instructions |
+| Agent | Role | Model | Provider | Cost | When Used |
+|-------|------|-------|----------|------|-----------|
+| **Dev-Manager** | Team Lead | gpt-oss-20b | Local (LMStudio) | Free | Planning, coordination, spawning |
+| **Fullstack-Dev** | Scaffold Engineer | kimi-k2.5-think | API (OpenCode Zen) | Pay-as-you-go | Heavy scaffolding, complex migrations |
+| **Code-Reviewer** | Quality Assistant | gpt-oss-20b | Local (LMStudio) | Free | Static analysis, security, reviews |
+
+### Why This Split?
+
+| Component | Local Reasoning (20B) | Paid API (Kimi K2.5) |
+|-----------|----------------------|---------------------|
+| Dev-Manager | ✅ Lightweight spawning, planning | ❌ Unnecessary cost |
+| Fullstack-Dev | ❌ VRAM unstable on complex tasks | ✅ MoE strength, reliable |
+| Code-Reviewer | ✅ Fast, analysis-focused | ❌ Overkill |
+
+### Cost Estimate
+
+| Task | Fullstack-Dev Tokens | Estimated Cost |
+|------|---------------------|----------------|
+| Simple CRUD | 5K-10K input | $0.01-0.03 |
+| Complex feature | 20K-50K input | $0.03-0.15 |
+| Full module | 50K-100K input | $0.10-0.30 |
+
+**Reality:** ~$0.10-0.50 per feature scaffold. Pay-as-you-go via OpenCode Zen.
 
 ---
 
-## Model Stack
-
-| Agent | Model | Reasoning | Use Case |
-|-------|-------|-----------|----------|
-| **Dev-Manager** | qwen3-30b | Complex | Planning, coordination, meta-prompts |
-| **Fullstack-Dev** | qwen3-30b | Complex | Scaffold generation, testing |
-| **Code-Reviewer** | gpt-oss-20b | Fast | Static analysis, reviews |
-
-**Rationale:**
-- **30B models** — Complex scaffolding, planning, multi-step reasoning
-- **20B model** — Faster, cheaper for lightweight tasks (reviews)
-
----
-
-## Agent Team (v0.4.0)
+## Agent Team (v0.4.2 - Hybrid)
 
 ### Orchestrator
 
-| Agent | Role | Model | Primary Function |
-|-------|------|-------|-----------------|
-| **Dev-Manager** | Team Lead | qwen3-30b | Planning, coordination, meta-prompts, sequential task execution |
+| Agent | Role | Model | Provider | Primary Function |
+|-------|------|-------|----------|-----------------|
+| **Dev-Manager** | Team Lead | gpt-oss-20b | Local (LMStudio) | Planning, coordination, meta-prompts, sequential task execution |
 
-### Worker Agents (Scaffold → User Implements)
+### Worker Agents
 
-| Agent | Role | Model | Function |
-|-------|------|-------|----------|
-| **Fullstack-Dev** | Scaffold Engineer | qwen3-30b | Migrations, models, controllers, routes, views, tests |
-| **Code-Reviewer** | Quality Assistant | gpt-oss-20b | Code review, static analysis, security |
+| Agent | Role | Model | Provider | Function |
+|-------|------|-------|----------|----------|
+| **Fullstack-Dev** | Scaffold Engineer | kimi-k2.5-think | API (OpenCode Zen) | Migrations, models, controllers, routes, views, tests |
+| **Code-Reviewer** | Quality Assistant | gpt-oss-20b | Local (LMStudio) | Code review, static analysis, security |
 
 ### Removed
 
 | Agent | Status | Reason |
 |-------|--------|--------|
-| **Context-Manager** | Removed | Replaced by Laravel Boost MCP + Project RAG |
+| **Context-Manager** | Removed | Replaced by Laravel Boost MCP + Guidelines |
+| **Project RAG** | Removed | Boost Guidelines cover patterns |
+
+### Why Kimi K2.5 for Fullstack-Dev?
+
+- **MoE (Mixture of Experts)** strength for complex scaffolding
+- Long context (200K+ tokens) handles large Laravel projects
+- Reliable API = no VRAM instability
+- Pay-as-you-go via OpenCode Zen ($0.60 input / $3.00 per 1M)
+- Reviews indicate excellent code generation quality
+
+### Why Local for Dev-Manager + Code-Reviewer?
+
+- **Dev-Manager:** Lightweight orchestration, spawning, planning → 20B reasoning model handles fine
+- **Code-Reviewer:** Fast analysis, pattern matching → 20B is perfect for static analysis
+- **Cost:** Zero for planning + review tasks
+- **Privacy:** Project context stays local
 
 ---
 
@@ -102,25 +121,14 @@ Fullstack-Dev uses Boost MCP tools for:
 | Documentation search | Query Laravel docs (17,000+ chunks) |
 | Pest integration | Generate test stubs |
 
-### Project RAG
+### Boost Guidelines
 
-For your application's knowledge:
-
-```
-rag.py search "<query>"
-  ├── ~/projects/your-app/docs/
-  ├── ~/projects/your-app/README.md
-  └── Custom patterns + conventions
-```
-
-**Invocation:**
-
-```markdown
-@context-manager
-Query: "<app-specific context need>"
-Project: ~/projects/my-laravel-app
-Format: markdown
-```
+| Pattern | Source |
+|---------|--------|
+| Livewire | Boost Guidelines |
+| Tailwind | Boost Guidelines |
+| Pest testing | Boost Guidelines |
+| Filament | Boost Guidelines |
 
 ---
 
@@ -131,14 +139,14 @@ Format: markdown
 ```
 User Request
     ↓
-Dev-Manager (analyzes, builds sequential plan)
+Dev-Manager (analyzes, builds sequential plan, local reasoning)
     ↓
 For each task:
     Dev-Manager creates META-PROMPT
     ↓
-    Spawn agent with meta-prompt
+    Spawn/Select agent (local or API based on task)
     ↓
-    Agent uses Boost MCP + Project RAG
+    Agent uses Boost MCP
     ↓
     Agent scaffolds + reports feedback
     ↓
@@ -147,15 +155,22 @@ For each task:
 Consolidated report to user
 ```
 
+### Agent Selection Logic
+
+| Task Type | Agent | Provider | When |
+|-----------|-------|----------|------|
+| Planning, coordination | Dev-Manager | Local (20B) | Always starts here |
+| Complex scaffolding | Fullstack-Dev | API (Kimi K2.5) | Heavy lifting, migrations |
+| Reviews, analysis | Code-Reviewer | Local (20B) | Quality gate |
+
 ### Meta-Prompt Structure
 
 ```
 # Role
 You are [agent name], a [role description].
 
-# Context (from Boost + Project RAG)
+# Context (from Laravel Boost MCP)
 [Framework context from Boost MCP]
-[Project context from RAG]
 
 # Task
 [Specific task description]
@@ -247,8 +262,6 @@ For each task:
     ↓
     Agent queries Boost MCP (framework)
     ↓
-    Agent queries Project RAG (domain)
-    ↓
     Agent scaffolds + reports feedback
     ↓
     Dev-Manager adjusts next steps
@@ -273,16 +286,12 @@ User reviews + implements business logic
    Dev-Manager spawns agent with meta-prompt
    Example: "Scaffold blog post module"
 
-4. CONTEXT PULL (via Boost + Project RAG)
+4. CONTEXT PULL (via Boost MCP)
    Agent uses Boost MCP for:
    - Current schema
    - Route definitions
    - Laravel documentation
-   
-   Agent queries Project RAG for:
-   - App-specific conventions
-   - Domain patterns
-   - Existing implementations
+   - Boost Guidelines for patterns
 
 5. SCAFFOLD
    Fullstack-Dev generates:
@@ -345,73 +354,6 @@ User reviews + implements business logic
 
 ---
 
-## Project RAG: Your App's Knowledge
-
-### Purpose
-
-Boost provides Laravel literacy. Project RAG provides **your application's** literacy:
-
-```
-What Project RAG Contains:
-├── ~/projects/your-app/docs/
-│   ├── architecture.md
-│   ├── patterns.md
-│   └── conventions.md
-├── README.md
-├── existing implementations
-└── domain-specific patterns
-```
-
-### Invocation
-
-```bash
-# CLI usage
-python ~/projects/agent-agency/rag/rag.py search "authentication patterns"
-
-# In agent prompt
-Context from Project RAG: [results from query]
-```
-
-### Integration Strategy
-
-1. Index project docs during setup
-2. Agent queries RAG on context pull
-3. Results merged with Boost context
-4. Both inform scaffolding decisions
-
----
-
-## Laravel RAG Exploration (Future)
-
-### Concept
-
-Build a Laravel RAG package that provides:
-
-- Project documentation search
-- Custom embedding pipeline
-- Artisan commands for indexing
-- MCP-compatible interface
-
-### Scope (v0.5.0+)
-
-```
-laravel-rag/
-├── src/
-│   ├── Commands/
-│   │   ├── IndexCommand.php
-│   │   └── SearchCommand.php
-│   ├── Embedding/
-│   │   └── EmbeddingService.php
-│   └── RagServiceProvider.php
-├── config/
-│   └── laravel-rag.php
-└── composer.json
-```
-
-This complements Boost — Boost handles Laravel docs, Laravel RAG handles your app docs.
-
----
-
 ## Success Metrics
 
 | Metric | Target |
@@ -442,10 +384,6 @@ agent-agency/
 │       ├── development-manager.md    # Orchestrator with meta-prompts
 │       ├── fullstack-dev.md          # Scaffold engineer + testing
 │       └── code-reviewer.md           # Quality assistant
-├── rag/
-│   ├── rag.py                        # CLI interface (project RAG)
-│   └── README.md                      # RAG documentation
-├── laravel-rag/                       # Future: Laravel RAG package
 ├── docs/
 │   └── workflow.md
 ├── ideas/
@@ -462,9 +400,11 @@ agent-agency/
 - **Laravel Boost** — Schema, routes, migrations, Pest testing, documentation
 - **Filesystem** — Project access
 
-### Local Tools
-- **LMStudio** — qwen3-30b, gpt-oss-20b
-- **RAG CLI** — python rag.py
+### Local Models (LMStudio)
+- **gpt-oss-20b** — Reasoning model for Dev-Manager + Code-Reviewer
+
+### API Models (OpenCode Zen)
+- **kimi-k2.5-think** — MoE model for Fullstack-Dev (pay-as-you-go)
 
 ---
 
@@ -472,7 +412,9 @@ agent-agency/
 
 | Version | Date | Description |
 |---------|------|-------------|
-| 0.4.0 | 2026-02-07 | Dropped Context-Manager, embraced Laravel Boost, added Project RAG |
+| 0.4.2 | 2026-02-08 | Hybrid architecture (local reasoning + Kimi K2.5 API) |
+| 0.4.1 | 2026-02-08 | FAILED - DeepSeek R1 crash, workers wouldn't spawn |
+| 0.4.0 | 2026-02-07 | Dropped Context-Manager, removed Project RAG, use Boost Guidelines |
 | 0.3.1 | 2026-02-05 | Model stack: qwen3-30b + gpt-oss-20b, meta-prompts, combined Fullstack-Dev |
 | 0.3.0 | 2026-02-04 | Pivot to assistive, RAG-powered Context-Manager |
 | 0.2.0 | 2026-02-02 | Task graphs, Debug-Agent, file-based context |
@@ -482,11 +424,13 @@ agent-agency/
 
 ## Next Steps
 
-1. [ ] Update agent definitions (remove Context-Manager)
-2. [ ] Define Project RAG indexing strategy
-3. [ ] Prototype Dev-Manager with meta-prompts
-4. [ ] Test Fullstack-Dev with Boost MCP integration
-5. [ ] Explore Laravel RAG package idea
+1. [x] Define hybrid architecture (local + API)
+2. [ ] Update agent definitions
+   - [ ] Fix Dev-Manager (remove @context-manager, update model)
+   - [ ] Update Fullstack-Dev (add Kimi K2.5 reference)
+   - [ ] Verify Code-Reviewer
+3. [ ] Test Dev-Manager spawning Kimi K2.5 Fullstack-Dev
+4. [ ] Prototype with sample Laravel feature
 
 ---
 
@@ -494,9 +438,7 @@ agent-agency/
 
 | Document | Status | Description |
 |----------|--------|-------------|
-| `docs/workflow.md` | Rewrite | v0.4.0 workflow with Boost + Project RAG |
-| `docs/project-rag.md` | New | Project RAG indexing + usage |
-| `docs/laravel-rag.md` | Future | Laravel RAG package specification |
+| `docs/workflow.md` | Rewrite | v0.4.0 workflow with Boost MCP |
 
 ---
 
