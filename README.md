@@ -1,154 +1,128 @@
-# Agent Agency v2.1
+# Agent Agency v0.4.2
 
-A collection of OpenCode-native agents for web development with local LLMs.
+A collection of OpenCode-native agents for hybrid web development using local + API models.
 
 ## Overview
 
-An "agency" of specialized AI agents that build web applications following a team-based workflow:
+An "agency" of specialized AI agents that build web applications following a team-based workflow with hybrid local/API model architecture:
 
-1. **Development-Manager** — Plans work and coordinates agents
-2. **Backend-Developer** — Laravel APIs, migrations, controllers
-3. **Frontend-Developer** — Tailwind, Livewire, Blade components
-4. **Debug-Agent** — Validates work before proceeding
+1. **Dev-Manager** — Plans work, coordinates agents (local: gpt-oss-20b)
+2. **Fullstack-Dev** — Scaffolding, migrations, controllers (API: Kimi K2.5)
+3. **Code-Reviewer** — Quality, security, static analysis (local: gpt-oss-20b)
+4. **Senior-Architect** — System design, architecture diagrams (local: gpt-oss-20b)
 
 ## Architecture
 
 ```
 User Request
     ↓
-Development-Manager
-    ├→ Load context files (3 Markdown files)
-    ├→ Build task dependency graph
-    ├→ Execute graph
-    │   ├→ @backend-developer
-    │   ├→ @frontend-developer
-    │   └→ @debug-agent (validation)
+Dev-Manager (local reasoning)
+    ├── Senior-Architect (system design) ──► Local Python scripts
+    ├── Fullstack-Dev (scaffolding) ─────► Kimi K2.5 (API)
+    └── Code-Reviewer (quality) ──────────► Local reasoning
     ↓
-Delivered Solution
+Result
 ```
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for full details.
+### Model Strategy
+
+| Agent | Role | Model | Provider | Cost |
+|-------|------|-------|----------|------|
+| Dev-Manager | Orchestrator | gpt-oss-20b | LMStudio (local) | Free |
+| Fullstack-Dev | Scaffold Engineer | kimi-k2.5 | OpenCode Zen (API) | Pay-as-you-go |
+| Code-Reviewer | Quality Assistant | gpt-oss-20b | LMStudio (local) | Free |
+| Senior-Architect | System Design | gpt-oss-20b | LMStudio (local) | Free |
 
 ## Quick Start
 
 ### Prerequisites
 
 1. **OpenCode** — https://opencode.ai/download
-2. **LMStudio** — https://lmstudio.ai/ with model loaded (qwen3-14b recommended)
+2. **LMStudio** — https://lmstudio.ai/ with `gpt-oss-20b` loaded
+3. **OpenCode Zen** — https://opencode.ai/auth (for Kimi K2.5 API access)
 
 ### Step 1: Configure LMStudio
 
 1. Open LMStudio → Local Server
-2. Select `qwen3-14b` (or equivalent)
+2. Select `gpt-oss-20b`
 3. Click **Start Server** (default: http://localhost:1234)
 
-### Step 2: Install Agents and Contexts
+### Step 2: Install Agents
 
 ```bash
+# Clone the repo
+git clone https://github.com/yourusername/agent-agency.git
+cd agent-agency
+
+# Copy agents to OpenCode
 cp -r .opencode/agents/* ~/.opencode/agents/
-cp -r contexts/* ~/projects/agent-agency/contexts/
+
+# Or run setup script
+./setup.sh
 ```
 
-### Step 3: (Optional) Add Laravel Boost
+### Step 3: Configure OpenCode Zen
 
-For Laravel projects:
+1. Run `opencode` → `/connect`
+2. Select "opencode" and sign in at https://opencode.ai/auth
+3. Add API key and billing
 
-```bash
-cd your-laravel-project
-composer require laravel/boost --dev
-php artisan boost:install
-```
-
-### Step 4: Start with Development-Manager
+### Step 4: Start Building
 
 ```bash
-opencode --model lmstudio/qwen3-14b --agent development-manager
+cd ~/projects/your-laravel-app
+opencode --agent development-manager
 ```
 
 ## Agent Reference
 
-### Development-Manager
+### Dev-Manager
 
 **Role:** Team lead, planner, coordinator
 
+**Model:** `gpt-oss-20b` (local, LMStudio)
+
 **What it does:**
-- Loads context files for project understanding
-- Analyzes requests and detects MVC vs API patterns
-- Builds task dependency graphs
-- Spawns @backend-developer, @frontend-developer, @debug-agent
-- Validates delivery against requirements
+- Analyzes requests and chooses right agent
+- Uses Laravel Boost MCP for context
+- Spawns workers: @fullstack-dev, @code-reviewer, @senior-architect
+- Delivers consolidated results
 
-**Context files loaded:**
-- `contexts/project/architecture.md`
-- `contexts/laravel/conventions.md`
-- `contexts/laravel/patterns.md`
+### Fullstack-Dev
 
-### Backend-Developer
+**Role:** Scaffold engineer
 
-**Role:** Server-side engineer
+**Model:** `kimi-k2.5` (API, OpenCode Zen)
 
 **What it does:**
 - Creates migrations, models, controllers
-- Builds RESTful APIs or MVC controllers
-- Follows Laravel conventions from context files
+- Builds Blade views and Livewire components
+- Generates Pest tests
+- Runs migrations
 
-**Context files loaded:**
-- `contexts/laravel/conventions.md`
-- `contexts/laravel/patterns.md`
+### Code-Reviewer
 
-### Frontend-Developer
+**Role:** Quality assistant
 
-**Role:** UI engineer
-
-**What it does:**
-- Creates Blade components and Livewire components
-- Applies Tailwind CSS with design tokens
-- Integrates with backend APIs
-
-**Context files loaded:**
-- `contexts/frontend/conventions.md`
-- `contexts/project/architecture.md`
-
-### Debug-Agent
-
-**Role:** QA specialist
+**Model:** `gpt-oss-20b` (local, LMStudio)
 
 **What it does:**
-- Validates migrations run correctly
-- Checks PHP and Blade syntax
-- Tests endpoint responses
-- Verifies full CRUD workflow
+- Static analysis
+- Security review
+- Code quality checks
+- Performance suggestions
 
-**Validation types:**
-- Backend (migrations, models, controllers)
-- Frontend (Blade, Tailwind, Livewire)
-- Integration (full CRUD workflow)
+### Senior-Architect
 
-## Context System
+**Role:** System design
 
-Instead of a Context-Manager agent, context is stored as Markdown files:
+**Model:** `gpt-oss-20b` (local, LMStudio)
 
-```
-contexts/
-├── index.md                      # Quick reference
-├── laravel/
-│   ├── conventions.md            # Naming, code style, patterns
-│   └── patterns.md               # MVC vs API decision tree
-├── frontend/
-│   └── conventions.md            # Tailwind tokens, components
-└── project/
-    └── architecture.md           # Project structure, workflow
-```
-
-## Task Dependency Graph
-
-Development-Manager builds explicit graphs:
-
-| Pattern | Use Case | Flow |
-|---------|----------|------|
-| **Sequential** | MVC CRUD | Backend → Verify → Frontend → Verify |
-| **Parallel** | Independent tasks | All parallel → Verify |
-| **Hybrid** | API + Admin UI | Backend → [Parallel: Frontend, Features] → Verify |
+**What it does:**
+- Architecture diagrams (Mermaid, PlantUML, ASCII)
+- Dependency analysis
+- Technology recommendations
+- Architecture Decision Records (ADRs)
 
 ## Project Structure
 
@@ -156,72 +130,89 @@ Development-Manager builds explicit graphs:
 agent-agency/
 ├── .opencode/
 │   └── agents/
-│       ├── development-manager.md    # Team lead with task graphs
-│       ├── backend-developer.md      # Laravel specialist
-│       ├── frontend-developer.md     # Tailwind/Livewire specialist
-│       └── debug-agent.md            # QA validation
-├── contexts/
-│   ├── index.md
-│   ├── laravel/
-│   │   ├── conventions.md
-│   │   └── patterns.md
-│   ├── frontend/
-│   │   └── conventions.md
-│   └── project/
-│       └── architecture.md
-├── docs/
-│   ├── bootstrap-tailwind-mapping.md
-│   ├── laravel-boost-integration.md
-│   └── workflow.md
-├── ideas/
-│   ├── current/
-│   └── future/
-├── ARCHITECTURE.md                   # Full architecture docs
-└── README.md
+│       ├── development-manager.md   # Orchestrator
+│       ├── fullstack-dev.md         # Scaffold engineer
+│       ├── code-reviewer.md         # Quality assistant
+│       └── senior-architect.md       # System design
+├── skills/
+│   └── handoff-tool/              # Session handoff
+├── handoffs/                       # Handoff documents
+├── ARCHITECTURE.md                  # Full architecture docs
+├── ROADMAP.md                       # Project roadmap
+├── README.md                        # This file
+└── setup.sh                        # Setup script
 ```
 
-## Stack
+## Dependencies
 
-| Component | Technology |
-|-----------|------------|
-| Editor | OpenCode |
-| Model | LMStudio (qwen3-14b, 14B parameters) |
-| Backend | Laravel 12 with SQLite |
-| Styling | Tailwind CSS v4 with Bootstrap tokens |
-| Components | Blade + Livewire |
-| MCP | Laravel Boost |
+### MCP Servers
+- **Laravel Boost** — Framework context, migrations, Pest testing
+- **Filesystem** — Project access
+
+### External Services
+- **OpenCode Zen** — Kimi K2.5 API for scaffolding
+- **LMStudio** — Local reasoning models
+
+### Local Tools
+- **PHP/Laravel** — For Laravel projects
+- **Python** — For senior-architect scripts
 
 ## Workflow Example
 
-**Request:** "Create a todo list feature"
+**Request:** "Build a blog posts feature"
 
-1. **Development-Manager** loads context, detects MVC pattern
-2. **Task Graph:** Backend → Verify → Frontend → Verify
-3. **@backend-developer** creates:
-   - Migration for todos table
-   - Todo model
-   - TodoController
-   - Routes
-4. **@debug-agent** validates: migration runs, endpoints respond
-5. **@frontend-developer** creates:
-   - Livewire TodoManager component
-   - Blade view
-6. **@debug-agent** validates: full CRUD workflow works
-7. **Complete** — todo list feature delivered
+1. **Dev-Manager** analyzes request → spawns @fullstack-dev
+2. **Fullstack-Dev** (Kimi K2.5) creates:
+   - Migration for posts table
+   - Post model with relationships
+   - PostsController
+   - Blade views (index, show, create, edit)
+   - Pest tests
+3. **Code-Reviewer** reviews code → reports issues
+4. **Dev-Manager** delivers complete feature
 
-## Requirements
+## Skills
 
-- OpenCode editor
-- LMStudio with local model (qwen3-14b recommended)
-- Laravel 12 (for Laravel projects)
-- Tailwind CSS v4 (for styling)
+### handoff-tool
+
+Structured session and agent handoff for seamless continuation.
+
+```bash
+# Generate handoff
+python skills/handoff-tool/scripts/handoff.py generate \
+    --path /path/to/project \
+    --task "Feature name" \
+    --completed "Task 1" "Task 2" \
+    --next-steps "Next step"
+
+# Resume from handoff
+python skills/handoff-tool/scripts/handoff.py resume \
+    --file HANDOFF_2026-02-08.md
+```
+
+## Success Metrics
+
+| Metric | Target | Actual |
+|--------|--------|--------|
+| Scaffold accuracy | >80% | ✅ 100% (blog feature) |
+| Agent handoff success | 100% | ✅ Working |
+| API cost per feature | <$0.50 | ~$0.15-0.30 |
+| Local reasoning uptime | 100% | ✅ Working |
 
 ## License
 
-MIT
+MIT License — See LICENSE file for details.
+
+## Contributing
+
+Contributions welcome! See issues for:
+- New agents
+- Skill improvements
+- Documentation fixes
 
 ## Version History
 
-- **1.0.0**: Initial — Orchestrator, Design, Frontend agents
-- **2.0.0**: Modular refactor — Development-Manager team model
-- **2.1.0**: File-based context, task graphs, Debug-Agent
+- **v0.4.2** — Hybrid architecture validated (local + API models)
+- **v0.4.1** — FAILED (VRAM issues, DeepSeek R1 crash)
+- **v0.4.0** — Embraced Laravel Boost, dropped Context-Manager
+- **v0.3.x** — Early iterations with various model stacks
