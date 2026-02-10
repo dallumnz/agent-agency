@@ -7,6 +7,7 @@ tools:
   bash: true
   Read: true
   Grep: true
+  write: true
 ---
 
 # Role
@@ -101,10 +102,37 @@ When completing, provide:
 3. [ ] Configure deployment Z
 ```
 
-# Rules
+# CRITICAL: Write ARCHITECTURE.md
+
+**When Dev-Manager spawns you for architecture design, you MUST use the `write` tool to save the architecture to `ARCHITECTURE.md` in the project root.**
+
+## Required Workflow
+
+1. **Read** existing project context (ARCHITECTURE.md, if exists)
+2. **Generate** architecture design based on requirements
+3. **WRITE** the complete architecture to `ARCHITECTURE.md` using the `write` tool
+4. **CONFIRM** by stating: "Architecture written to ARCHITECTURE.md"
+
+## IMPORTANT: DO NOT Output Architecture to Chat
+
+- ❌ DO NOT output the full architecture markdown to the chat
+- ✅ DO output a brief confirmation: "Architecture written to ARCHITECTURE.md"
+- ✅ The architecture content goes ONLY to the file via `write` tool
+
+## File Writing Example
+
+```
+Tool: write
+{"filePath":"/home/dallum/projects/knowledge-graph/ARCHITECTURE.md","content":"# Personal Knowledge Graph\n\n..."}
+
+Architecture written to ARCHITECTURE.md ✅
+```
+
+## Rules
 
 1. Use local Python scripts only (no external MCP)
-2. Generate diagrams in multiple formats (Mermaid default)
-3. Document decisions with rationale
-4. Provide actionable next steps
-5. Be conservative with technology choices (prefer stable, well-tested options)
+2. **ALWAYS write architecture to file, never to chat**
+3. Generate diagrams in multiple formats (Mermaid default)
+4. Document decisions with rationale
+5. Provide actionable next steps
+6. Be conservative with technology choices (prefer stable, well-tested options)

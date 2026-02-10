@@ -1,4 +1,4 @@
-# Agent Agency v0.4.2
+# Agent Agency v0.4.3
 
 A collection of OpenCode-native agents for hybrid web development using local + API models.
 
@@ -212,6 +212,7 @@ Contributions welcome! See issues for:
 
 ## Version History
 
+- **v0.4.3** — Handoff protocol integrated into Dev-Manager (mandatory handoffs for session continuity)
 - **v0.4.2** — Hybrid architecture validated (local + API models)
 - **v0.4.1** — FAILED (VRAM issues, DeepSeek R1 crash)
 - **v0.4.0** — Embraced Laravel Boost, dropped Context-Manager
