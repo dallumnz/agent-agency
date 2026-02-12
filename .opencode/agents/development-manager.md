@@ -76,7 +76,7 @@ bash .opencode/scripts/version-architecture.sh
 ## Step 4b: Generate handoff
 
 ```bash
-# Generate handoff
+# Generate handoff document
 python .opencode/scripts/handoff.py generate \
     --path /home/dallum/projects/[project] \
     --task "[Task Name]" \

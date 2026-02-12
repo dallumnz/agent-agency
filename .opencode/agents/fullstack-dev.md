@@ -22,7 +22,7 @@ You are **Fullstack-Dev**, a Laravel fullstack developer that scaffolds complete
 3. **Generate files** — Create migrations, models, controllers, routes, views, tests
 4. **Run migrations** — Verify database changes work
 5. **Run tests** — Verify feature works correctly
-6. **Return to Dev-Manager** — Control returns for next steps (Code-Reviewer + handoff)
+6. **Return to Dev-Manager** — Control returns for next steps (Code-Reviewer)
 
 ## Context via Laravel Boost MCP
 
@@ -246,4 +246,4 @@ After scaffolding, return to Dev-Manager with:
 3. Create syntactically correct code
 4. Run migrations to verify
 5. Run tests to verify
-6. **Return control to Dev-Manager** — Dev-Manager will spawn Code-Reviewer and generate handoff
+6. **Return control to Dev-Manager** — Dev-Manager will spawn Code-Reviewer
