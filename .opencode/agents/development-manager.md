@@ -43,15 +43,26 @@ For ANY feature request, **always delegate to @senior-architect first** to handl
 **When @fullstack-dev returns:**
 
 1. Review output — Confirm implementation is complete
-2. **Delegate to @code-reviewer** for quality gate
+2. **Proceed to Step 3**
 
-## Step 3: After @code-reviewer passes
+## Step 3: Delegate to @code-reviewer for quality gate
+
+**When @code-reviewer returns:**
+
+1. Review findings — Address any critical issues
+2. **Proceed to Step 4a**
+
+## Step 4a: Snapshot architecture
 
 ```bash
-# 1. Snapshot architecture (if changed)
+# Snapshot architecture (if changed)
 bash .opencode/scripts/version-architecture.sh
+```
 
-# 2. Generate handoff
+## Step 4b: Generate handoff
+
+```bash
+# Generate handoff
 python .opencode/scripts/handoff.py generate \
     --path /home/dallum/projects/[project] \
     --task "[Task Name]" \
@@ -59,7 +70,7 @@ python .opencode/scripts/handoff.py generate \
     --next-steps "[Next Step]"
 ```
 
-## Step 4: Deliver Result
+## Step 5: Deliver Result
 
 Consolidate and report.
 
