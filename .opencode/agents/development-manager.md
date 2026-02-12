@@ -50,7 +50,7 @@ For ANY feature request, **always delegate to @senior-architect first** to handl
 1. They will have written ARCHITECTURE.md
 2. **Verify ARCHITECTURE.md was written** (check file exists and has content)
 3. If ARCHITECTURE.md is missing or empty, **delegate back to @senior-architect** with: "ARCHITECTURE.md was not written. Please write it immediately."
-4. Once verified, **proceed to delegate to @fullstack-dev** with the plan as context
+4. Once verified, **delegate to @fullstack-dev** with the plan as context
 
 ## Step 2: Delegate to @fullstack-dev for implementation
 
