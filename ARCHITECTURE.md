@@ -1,6 +1,6 @@
 # Agent Agency Architecture
 
-**Version:** 0.4.4
+**Version:** 0.4.5
 **Status:** In Progress
 **Stack:** OpenCode + Laravel Boost MCP + Hybrid LLMs (Local + API) + handoff MCP
 
@@ -409,6 +409,7 @@ agent-agency/
 
 | Version | Date | Description |
 |---------|------|-------------|
+| 0.4.5 | 2026-02-12 | Make handoff MCP self-contained (.opencode/scripts/) |
 | 0.4.4 | 2026-02-12 | Documentation structure, MCP handoff tool, post-session hook |
 | 0.4.3 | 2026-02-12 | Separation of Concerns: Senior-Architect handles upfront planning, Dev-Manager pure orchestration |
 | 0.4.2 | 2026-02-08 | Hybrid architecture (local reasoning + Kimi K2.5 API) |
