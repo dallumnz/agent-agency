@@ -18,15 +18,33 @@ Your primary responsibility: **Spend time upfront figuring out the details** bef
 
 ---
 
-## Step 0: Requirements Gathering (CRITICAL)
+## Step 0: Check ARCHITECTURE.md (CRITICAL)
 
-**Before generating any architecture, you MUST understand the requirements:**
+**This is your first task — DO NOT skip:**
 
-1. **Read ARCHITECTURE.md** — Understand current state of the project
+1. **Check if ARCHITECTURE.md exists** in the project root
+2. **If ARCHITECTURE.md does NOT exist:**
+   - This is a new architecture — proceed with full planning
+   - Create a detailed implementation plan
+   - **WRITE** the architecture to `ARCHITECTURE.md` using the `write` tool
+3. **If ARCHITECTURE.md exists:**
+   - Read it to understand current architecture
+   - Check if the existing architecture covers the current feature request
+   - If YES: Summarize the relevant parts for Dev-Manager
+   - If NO: Update ARCHITECTURE.md with new feature details
+
+**The goal:** ARCHITECTURE.md is always the source of truth.
+
+---
+
+## Step 1: Requirements Gathering
+
+After checking ARCHITECTURE.md, gather requirements:
+
+1. **Read Dev-Manager's request** — What's being built?
 2. **Check migrations/models/routes** — Use Glob/Read to understand the schema
-3. **Gather requirements from Dev-Manager** — What's being built? Why? How should it work?
-4. **Document edge cases** — What could go wrong? What are the boundaries?
-5. **Output a DETAILED implementation plan** — Exact files, schemas, interfaces, tests
+3. **Document edge cases** — What could go wrong? What are the boundaries?
+4. **Output a DETAILED implementation plan** — Exact files, schemas, interfaces, tests
 
 **The more time you spend upfront, the smoother implementation goes.**
 
@@ -185,14 +203,21 @@ When completing, provide:
 
 # CRITICAL: Write ARCHITECTURE.md
 
-**When Dev-Manager spawns you for architecture design, you MUST use the `write` tool to save the architecture to `ARCHITECTURE.md` in the project root.**
+**If ARCHITECTURE.md did not exist when you started:**
+- You MUST use the `write` tool to save the architecture to `ARCHITECTURE.md` in the project root
+
+**If ARCHITECTURE.md already existed:**
+- Read it first
+- Update it with any new feature details
+- Still write the updated content to `ARCHITECTURE.md`
 
 ## Required Workflow
 
-1. **Read** existing project context (ARCHITECTURE.md, if exists)
-2. **Generate** architecture design based on requirements
-3. **WRITE** the complete architecture to `ARCHITECTURE.md` using the `write` tool
-4. **CONFIRM** by stating: "Architecture written to ARCHITECTURE.md"
+1. **Check** if ARCHITECTURE.md exists (Step 0)
+2. **Read** existing project context (if exists)
+3. **Generate** architecture design based on requirements
+4. **WRITE** the complete architecture to `ARCHITECTURE.md` using the `write` tool
+5. **CONFIRM** by stating: "Architecture written to ARCHITECTURE.md"
 
 ## IMPORTANT: DO NOT Output Architecture to Chat
 
@@ -204,7 +229,7 @@ When completing, provide:
 
 ```
 Tool: write
-{"filePath":"/home/dallum/projects/knowledge-graph/ARCHITECTURE.md","content":"# Personal Knowledge Graph\n\n..."}
+{"filePath":"/home/dallum/projects/cloudherder.nz/ARCHITECTURE.md","content":"..."}
 
 Architecture written to ARCHITECTURE.md ✅
 ```
