@@ -295,25 +295,35 @@ User: "Add a comments section to blog posts"
 
 # Mandatory Handoff Protocol
 
-**CRITICAL:** Every task MUST end with a handoff document.
+**CRITICAL:** Every task MUST end with a handoff document using the `handoff` MCP tool.
 
-## Creating an OpenCode Handoff Tool
+## Available Handoff Tools
 
-Dev-Manager should create an OpenCode tool for handoffs:
+The following tools are available via MCP:
 
+### `handoff.generate`
+Generate a handoff document for the current task.
+
+**Usage:**
 ```yaml
-# In opencode.json
-{
-  "tools": {
-    "handoff": {
-      "command": "python /home/dallum/.openclaw/workspace/skills/handoff-tool/scripts/handoff.py",
-      "args": ["generate", "--path", "$project_path", "--task", "$task", "--completed", "$completed", "--next-steps", "$next_steps"]
-    }
-  }
-}
+task: |
+  Complete the Newsletter Post type implementation
+  
+  After completing, call the handoff MCP tool with:
+  - path: /home/dallum/projects/cloudherder.nz
+  - task: "Newsletter Post Type"
+  - completed: ["NewsletterPost model", "Migration", "Factory", "Controller"]
+  - next_steps: ["Deploy to production", "Add API endpoints"]
 ```
 
-This makes handoff a first-class tool, not an optional script.
+**Parameters:**
+- `path` — Project directory (absolute path)
+- `task` — Brief task name
+- `completed` — Array of completed items
+- `next_steps` — Array of next steps
+- `git` — Include git status (boolean)
+- `commits` — Number of recent commits to include
+- `pending` — Include pending items (boolean)
 
 ## When to Generate Handoff
 
@@ -321,32 +331,6 @@ This makes handoff a first-class tool, not an optional script.
 2. **When switching contexts** — When moving to different work
 3. **When agent returns control** — Workers must handoff to Dev-Manager
 4. **End of session** — Generate handoff before closing
-
-## How to Generate Handoff
-
-```bash
-# From the project directory
-python /home/dallum/.openclaw/workspace/skills/handoff-tool/scripts/handoff.py generate \
-    --path /home/dallum/projects/knowledge-graph \
-    --task "MetadataService Implementation" \
-    --completed "Created MetadataService" "Created IMetadataService" \
-    --next-steps "Implement DocumentChunker" "Implement KeywordExtractor"
-```
-
-## Handoff Requirements
-
-### For Dev-Manager (Before Task Completion)
-1. **Summarize what was accomplished**
-2. **List files created/modified**
-3. **Document current state** (database, API, tests)
-4. **Identify pending items**
-5. **Provide next steps** for continuation
-
-### For Worker Agents (Before Returning to Dev-Manager)
-1. **Summarize work completed**
-2. **List files created/modified**
-3. **Note any issues or blockers**
-4. **Provide next steps** for Dev-Manager
 
 ## Quality Checklist Before Generating Handoff
 
@@ -356,14 +340,6 @@ python /home/dallum/.openclaw/workspace/skills/handoff-tool/scripts/handoff.py g
 - [ ] Summary clearly states what was done
 - [ ] Next steps are actionable
 - [ ] Known issues documented
-
-## Resuming from Handoff
-
-```bash
-# Resume work from a handoff file
-python /home/dallum/.openclaw/workspace/skills/handoff-tool/scripts/handoff.py resume \
-    --file /home/dallum/projects/knowledge-graph/handoffs/HANDOFF_2026-02-11_ui.md
-```
 
 ---
 
