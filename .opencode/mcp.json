@@ -6,7 +6,7 @@
       "enabled": true,
       "command": [
         "python",
-        "/home/dallum/.openclaw/workspace/skills/handoff-tool/scripts/mcp_wrapper.py"
+        ".opencode/scripts/mcp_wrapper.py"
       ],
       "env": {}
     }
