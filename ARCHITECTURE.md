@@ -1,6 +1,6 @@
 # Agent Agency Architecture
 
-**Version:** 0.4.2
+**Version:** 0.4.3
 **Status:** In Progress
 **Stack:** OpenCode + Laravel Boost MCP + Hybrid LLMs (Local + Kimi K2.5)
 
@@ -13,7 +13,7 @@
 | Before (v0.3.x) | After (v0.4.0) |
 |------------------|-----------------|
 | Context-Manager as separate RAG agent | **Laravel Boost** provides Laravel context |
-| Custom Laravel conventions + patterns | **Boost Guidelines** cover framework patterns |
+| Custom Laravel conventions + patterns | **Boost Guidelines** cover ecosystem patterns |
 | Separate Project RAG | **Removed** (not needed) |
 | Build context layer from scratch | Use Boost MCP + Guidelines |
 
@@ -28,33 +28,78 @@
 
 ---
 
-## Architecture Reframe (v0.4.2 - Hybrid)
+## Architecture Reframe (v0.4.3 - Separation of Concerns)
 
 ```
 User Request
     ↓
-Dev-Manager (orchestrates, local reasoning)
-    ├── Worker Agents (task execution)
-    └── Laravel Boost MCP + Guidelines (framework context)
+Dev-Manager (pure orchestration)
+    ├── Senior-Architect (upfront planning)
+    │   Returns: exact files, schemas, requirements
+    │
+    ├── Fullstack-Dev (execution)
+    │
+    └── Code-Reviewer (quality gate)
     ↓
 Result
 ```
 
-### Hybrid Model Strategy
+### Why Separation of Concerns?
+
+| Problem | Solution |
+|---------|----------|
+| Dev-Manager doing two jobs (planning + orchestration) | Senior-Architect handles upfront planning |
+| Scope too big | Senior-Architect breaks into exact files |
+| Missing edge cases | Senior-Architect documents boundaries |
+
+### The Flow
+
+```
+1. User Request → Dev-Manager
+2. Dev-Manager → Senior-Architect (figure out details)
+3. Senior-Architect returns: exact files, schemas, requirements
+4. Dev-Manager → Fullstack-Dev (execute the plan)
+5. Dev-Manager → Code-Reviewer (quality gate)
+6. Result → User
+```
+
+---
+
+## Agent Team (v0.4.3 - Separation of Concerns)
+
+### Orchestrator
+
+| Agent | Role | Model | Provider | Primary Function |
+|-------|------|-------|----------|-----------------|
+| **Dev-Manager** | Team Lead | gpt-oss-20b | Local (LMStudio) | Pure orchestration — spawns agents, consolidates results |
+
+### Worker Agents
+
+| Agent | Role | Model | Provider | Function |
+|-------|------|-------|----------|----------|
+| **Senior-Architect** | Planner | gpt-oss-20b | Local (LMStudio) | Upfront planning, detailed specs, exact files, schemas |
+| **Fullstack-Dev** | Scaffold Engineer | kimi-k2.5 | API (OpenCode Zen) | Implementation, scaffolding, CRUD features |
+| **Code-Reviewer** | Quality Assistant | gpt-oss-20b | Local (LMStudio) | Code review, static analysis, security |
+
+### Agent Responsibilities
+
+| Agent | Does | Does NOT |
+|-------|------|----------|
+| **Senior-Architect** | Spends time upfront, figures out details, outputs exact files, schemas, requirements | Execution (leaves that to Fullstack-Dev) |
+| **Dev-Manager** | Pure orchestration — spawns agents, consolidates results, enforces handoffs | Upfront planning (that's Senior-Architect's job) |
+| **Fullstack-Dev** | Implementation based on Senior-Architect's plan | Planning (Dev-Manager handles that) |
+| **Code-Reviewer** | Quality checks, security reviews | Planning or execution |
+
+---
+
+## Hybrid Model Strategy
 
 | Agent | Role | Model | Provider | Cost | When Used |
 |-------|------|-------|----------|------|-----------|
 | **Dev-Manager** | Team Lead | gpt-oss-20b | Local (LMStudio) | Free | Planning, coordination, spawning |
+| **Senior-Architect** | Planner | gpt-oss-20b | Local (LMStudio) | Free | Upfront planning, detailed specs |
 | **Fullstack-Dev** | Scaffold Engineer | kimi-k2.5-think | API (OpenCode Zen) | Pay-as-you-go | Heavy scaffolding, complex migrations |
 | **Code-Reviewer** | Quality Assistant | gpt-oss-20b | Local (LMStudio) | Free | Static analysis, security, reviews |
-
-### Why This Split?
-
-| Component | Local Reasoning (20B) | Paid API (Kimi K2.5) |
-|-----------|----------------------|---------------------|
-| Dev-Manager | ✅ Lightweight spawning, planning | ❌ Unnecessary cost |
-| Fullstack-Dev | ❌ VRAM unstable on complex tasks | ✅ MoE strength, reliable |
-| Code-Reviewer | ✅ Fast, analysis-focused | ❌ Overkill |
 
 ### Cost Estimate
 
@@ -65,45 +110,6 @@ Result
 | Full module | 50K-100K input | $0.10-0.30 |
 
 **Reality:** ~$0.10-0.50 per feature scaffold. Pay-as-you-go via OpenCode Zen.
-
----
-
-## Agent Team (v0.4.2 - Hybrid)
-
-### Orchestrator
-
-| Agent | Role | Model | Provider | Primary Function |
-|-------|------|-------|----------|-----------------|
-| **Dev-Manager** | Team Lead | gpt-oss-20b | Local (LMStudio) | Planning, coordination, meta-prompts, sequential task execution |
-
-### Worker Agents
-
-| Agent | Role | Model | Provider | Function |
-|-------|------|-------|----------|----------|
-| **Fullstack-Dev** | Scaffold Engineer | kimi-k2.5-think | API (OpenCode Zen) | Migrations, models, controllers, routes, views, tests |
-| **Code-Reviewer** | Quality Assistant | gpt-oss-20b | Local (LMStudio) | Code review, static analysis, security |
-
-### Removed
-
-| Agent | Status | Reason |
-|-------|--------|--------|
-| **Context-Manager** | Removed | Replaced by Laravel Boost MCP + Guidelines |
-| **Project RAG** | Removed | Boost Guidelines cover patterns |
-
-### Why Kimi K2.5 for Fullstack-Dev?
-
-- **MoE (Mixture of Experts)** strength for complex scaffolding
-- Long context (200K+ tokens) handles large Laravel projects
-- Reliable API = no VRAM instability
-- Pay-as-you-go via OpenCode Zen ($0.60 input / $3.00 per 1M)
-- Reviews indicate excellent code generation quality
-
-### Why Local for Dev-Manager + Code-Reviewer?
-
-- **Dev-Manager:** Lightweight orchestration, spawning, planning → 20B reasoning model handles fine
-- **Code-Reviewer:** Fast analysis, pattern matching → 20B is perfect for static analysis
-- **Cost:** Zero for planning + review tasks
-- **Privacy:** Project context stays local
 
 ---
 
@@ -132,60 +138,86 @@ Fullstack-Dev uses Boost MCP tools for:
 
 ---
 
-## Dev-Manager: Meta-Prompts + Sequential Planning
+## Senior-Architect: Upfront Planning
 
-### Planning Workflow
+### Step 0: Requirements Gathering (CRITICAL)
 
+Before generating any architecture, Senior-Architect MUST:
+
+1. **Read ARCHITECTURE.md** — Understand current state
+2. **Check migrations/models/routes** — Use Glob/Read to understand schema
+3. **Gather requirements from Dev-Manager** — What's being built? Why? How?
+4. **Document edge cases** — What could go wrong? What are the boundaries?
+5. **Output a DETAILED implementation plan** — Exact files, schemas, interfaces, tests
+
+### Senior-Architect's Output
+
+```markdown
+## Implementation Plan: [Feature Name]
+
+### 1. Requirements Summary
+- What needs to be built
+- Why it's needed
+- How it should work
+
+### 2. Database Schema Changes
+```php
+// Exact migration code
 ```
-User Request
-    ↓
-Dev-Manager (analyzes, builds sequential plan, local reasoning)
-    ↓
-For each task:
-    Dev-Manager creates META-PROMPT
-    ↓
-    Spawn/Select agent (local or API based on task)
-    ↓
-    Agent uses Boost MCP
-    ↓
-    Agent scaffolds + reports feedback
-    ↓
-    Dev-Manager incorporates feedback → adjusts next steps
-    ↓
-Consolidated report to user
+
+### 3. Models Required
+| Model | Location | Purpose |
+
+### 4. Controllers Required
+| Controller | Location | Methods |
+
+### 5. Routes Required
+```php
+// Exact route definitions
 ```
 
-### Agent Selection Logic
+### 6. Tests Required
+| Test | Location | Purpose |
 
-| Task Type | Agent | Provider | When |
-|-----------|-------|----------|------|
-| Planning, coordination | Dev-Manager | Local (20B) | Always starts here |
-| Complex scaffolding | Fullstack-Dev | API (Kimi K2.5) | Heavy lifting, migrations |
-| Reviews, analysis | Code-Reviewer | Local (20B) | Quality gate |
+### 7. Files to Create (Exact Paths)
+- `app/Models/Feature.php`
+- `database/migrations/YYYY_MM_DD_HHMMSS_create_feature_table.php`
+- `tests/Unit/Feature/FeatureTest.php`
 
-### Meta-Prompt Structure
+### 8. Edge Cases to Handle
+- What happens when X is null?
+- What validation is needed?
 
+### 9. Integration Points
+- Does this feature interact with existing models?
 ```
-# Role
-You are [agent name], a [role description].
 
-# Context (from Laravel Boost MCP)
-[Framework context from Boost MCP]
+---
 
-# Task
-[Specific task description]
+## Dev-Manager: Pure Orchestration
 
-# Constraints
-- [Constraint 1]
-- [Constraint 2]
+### What Dev-Manager Does
 
-# Success Criteria
-- [Criterion 1]
-- [Criterion 2]
+1. **Analyze Request** — Is this new (spawn Senior-Architect) or existing patterns (spawn Fullstack-Dev)?
+2. **Gather Quick Context** — Check ARCHITECTURE.md, use Boost MCP for schema/routes
+3. **Spawn Appropriate Agent** — Based on request type
+4. **Consolidate Results** — Collect outputs, enforce handoffs
+5. **Deliver to User** — Clear summary
 
-# Previous Feedback
-[Any feedback from prior steps to incorporate]
-```
+### What Dev-Manager Does NOT Do
+
+- ❌ Upfront planning (that's Senior-Architect's job)
+- ❌ Implementation (that's Fullstack-Dev's job)
+- ❌ Code review (that's Code-Reviewer's job)
+
+### Spawning Logic
+
+| Request Type | Action |
+|--------------|--------|
+| New feature / complex system | Spawn @senior-architect first |
+| Existing patterns / simple feature | Spawn @fullstack-dev directly |
+| Code review | Spawn @code-reviewer |
+| Continue from architecture | Spawn @fullstack-dev with Senior-Architect's plan |
 
 ---
 
@@ -214,19 +246,6 @@ Single agent benefits:
 | **Views/Components** | Blade files, Livewire | UI customization, content |
 | **Tests** | Feature + Unit tests (Pest) | Test data, edge case assertions |
 
-### Laravel Boost Pest Integration
-
-```bash
-# Install Laravel Boost
-composer require laravel/boost --dev
-php artisan boost:install
-```
-
-Fullstack-Dev uses Boost MCP to:
-- Read database schema
-- Generate migrations
-- Create Pest test stubs
-
 ---
 
 ## Code-Reviewer Agent
@@ -250,25 +269,23 @@ Focus: [security | performance | style | all]
 
 ## Workflow Pattern
 
-### High-Level Flow
+### High-Level Flow (Separation of Concerns)
 
 ```
 User Request
     ↓
-Dev-Manager (sequential plan + meta-prompts)
-    ↓
-For each task:
-    Spawn agent with meta-prompt
-    ↓
-    Agent queries Boost MCP (framework)
-    ↓
-    Agent scaffolds + reports feedback
-    ↓
-    Dev-Manager adjusts next steps
+Dev-Manager (analyzes, decides who to spawn)
+    │
+    ├─→ Senior-Architect (new features)
+    │       Returns: exact files, schemas, requirements
+    │       ↓
+    │
+    └─→ Fullstack-Dev (execution)
+            Uses: Senior-Architect's plan + Boost MCP
+            ↓
+    → Code-Reviewer (quality gate, optional)
     ↓
 Consolidated report to user
-    ↓
-User reviews + implements business logic
 ```
 
 ### Detailed Sequence
@@ -277,80 +294,59 @@ User reviews + implements business logic
 1. REQUEST
    User describes task to Dev-Manager
 
-2. PLAN
-   Dev-Manager analyzes request
-   Builds sequential task list
-   Creates meta-prompts for each agent
+2. ANALYZE
+   Dev-Manager decides:
+   - New feature? → Spawn Senior-Architect
+   - Existing patterns? → Spawn Fullstack-Dev directly
 
-3. SPAWN
-   Dev-Manager spawns agent with meta-prompt
-   Example: "Scaffold blog post module"
+3. PLANNING (Senior-Architect for new features)
+   - Reads requirements from Dev-Manager
+   - Checks existing codebase (ARCHITECTURE.md, migrations)
+   - Documents edge cases and boundaries
+   - Outputs: exact files, schemas, requirements
 
-4. CONTEXT PULL (via Boost MCP)
-   Agent uses Boost MCP for:
-   - Current schema
-   - Route definitions
-   - Laravel documentation
-   - Boost Guidelines for patterns
+4. EXECUTION (Fullstack-Dev)
+   - Receives Senior-Architect's plan (or uses existing patterns)
+   - Queries Boost MCP for framework context
+   - Scaffolds: migrations, models, controllers, routes, views, tests
 
-5. SCAFFOLD
-   Fullstack-Dev generates:
-   - Migrations, models, controllers
-   - Routes, views, components
-   - Feature/unit tests (via Boost Pest)
+5. REVIEW (Code-Reviewer, optional)
+   - Static analysis of scaffolded code
+   - Security scan
+   - Performance suggestions
 
-6. FEEDBACK LOOP
-   Agent returns scaffold report to Dev-Manager
-   Dev-Manager incorporates feedback
-   Adjusts next tasks if needed
-
-7. CONSOLIDATE
+6. CONSOLIDATE
    Dev-Manager collects all outputs
+   Enforces handoff protocol
    Provides clear summary to user
-
-8. REVIEW + IMPLEMENT
-   User reviews scaffold
-   Fills in business logic
-   Refines to professional standard
 ```
 
 ---
 
-## Scaffolding Scope
+## Handoff Protocol (MANDATORY)
 
-### What Agents Scaffold
+### Why Handoffs Matter
 
-| Component | Description | User Implements |
-|-----------|-------------|-----------------|
-| **Migrations** | Database tables, columns, indexes | Business logic, relationships |
-| **Models** | Class structure, relationships | Custom attributes, complex logic |
-| **Controllers** | CRUD methods, request validation | Business rules, complex operations |
-| **Routes** | Route definitions, group structure | Route middleware custom logic |
-| **Views/Components** | Blade files, Livewire | UI customization, content |
-| **Tests** | Feature + Unit test stubs (Pest) | Test data, edge cases, assertions |
+- Prevents drift between sessions
+- Documents schema changes, test status, pending work
+- Enables true multi-session development
+- **Without handoffs → orphaned work → fragmentation**
 
----
+### When to Create a Handoff
 
-## Review Flow
+1. **Before task completion** — Always generate handoff before finishing
+2. **When switching contexts** — When moving to different work
+3. **When agent returns control** — Workers must handoff to Dev-Manager
+4. **End of session** — Generate handoff before closing
 
-### Multi-Level Review
+### Handoff Requirements
 
-```
-1. DEV-MANAGER REVIEW
-   └─ Consolidates agent reports
-   └─ Checks for completeness
-   └─ Flags gaps
-
-2. CODE-REVIEWER REVIEW (if spawned)
-   └─ Static analysis
-   └─ Security scan
-   └─ Style compliance
-
-3. USER REVIEW
-   └─ Scaffold quality
-   └─ Architecture fit
-   └─ Business logic requirements
-```
+| Agent | Responsibility |
+|-------|----------------|
+| Senior-Architect | Documents planning decisions, edge cases, exact files |
+| Fullstack-Dev | Summarizes work completed, files created, issues encountered |
+| Code-Reviewer | Lists concerns found, severity, recommendations |
+| Dev-Manager | Consolidates all, provides next steps, current state |
 
 ---
 
@@ -381,9 +377,10 @@ User reviews + implements business logic
 agent-agency/
 ├── .opencode/
 │   └── agents/
-│       ├── development-manager.md    # Orchestrator with meta-prompts
-│       ├── fullstack-dev.md          # Scaffold engineer + testing
-│       └── code-reviewer.md           # Quality assistant
+│       ├── development-manager.md    # Pure orchestrator
+│       ├── senior-architect.md       # Upfront planning
+│       ├── fullstack-dev.md          # Scaffold engineer
+│       └── code-reviewer.md          # Quality assistant
 ├── docs/
 │   └── workflow.md
 ├── ideas/
@@ -401,7 +398,7 @@ agent-agency/
 - **Filesystem** — Project access
 
 ### Local Models (LMStudio)
-- **gpt-oss-20b** — Reasoning model for Dev-Manager + Code-Reviewer
+- **gpt-oss-20b** — Reasoning model for Dev-Manager, Senior-Architect, Code-Reviewer
 
 ### API Models (OpenCode Zen)
 - **kimi-k2.5-think** — MoE model for Fullstack-Dev (pay-as-you-go)
@@ -412,6 +409,7 @@ agent-agency/
 
 | Version | Date | Description |
 |---------|------|-------------|
+| 0.4.3 | 2026-02-12 | Separation of Concerns: Senior-Architect handles upfront planning, Dev-Manager pure orchestration |
 | 0.4.2 | 2026-02-08 | Hybrid architecture (local reasoning + Kimi K2.5 API) |
 | 0.4.1 | 2026-02-08 | FAILED - DeepSeek R1 crash, workers wouldn't spawn |
 | 0.4.0 | 2026-02-07 | Dropped Context-Manager, removed Project RAG, use Boost Guidelines |
@@ -422,23 +420,22 @@ agent-agency/
 
 ---
 
-## Next Steps
+## Key Insights
 
-1. [x] Define hybrid architecture (local + API)
-2. [ ] Update agent definitions
-   - [ ] Fix Dev-Manager (remove @context-manager, update model)
-   - [ ] Update Fullstack-Dev (add Kimi K2.5 reference)
-   - [ ] Verify Code-Reviewer
-3. [ ] Test Dev-Manager spawning Kimi K2.5 Fullstack-Dev
-4. [ ] Prototype with sample Laravel feature
+### "If we are to solve complex problems, then we have to spend more time working out the details."
 
----
+This principle drove the separation of concerns:
+- Dallum + Claw work **with** Senior-Architect to design
+- Dev-Manager executes the plan
+- Each agent has one job
 
-## Documentation Plan
+### Separation of Benefits
 
-| Document | Status | Description |
-|----------|--------|-------------|
-| `docs/workflow.md` | Rewrite | v0.4.0 workflow with Boost MCP |
+| Before | After |
+|--------|-------|
+| Dev-Manager planning + orchestrating | Senior-Architect plans, Dev-Manager orchestrates |
+| Scope too big | Exact files, smaller chunks |
+| Missing edge cases | Documented in Senior-Architect's output |
 
 ---
 
