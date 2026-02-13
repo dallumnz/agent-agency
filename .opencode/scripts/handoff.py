@@ -25,7 +25,7 @@ except ImportError:
     class Style:
         RESET_ALL = ""
 
-DEFAULT_OUTPUT_DIR = "handoffs"
+DEFAULT_OUTPUT_DIR = "documentation/handoffs"
 TEMPLATE_FILE = Path(__file__).parent / "handoff-template.md"
 ARCHITECTURE_FILE = Path(__file__).parent.parent.parent / "ARCHITECTURE.md"
 ARCHITECTURE_DIR = Path(__file__).parent.parent.parent / "documentation" / "architecture"
