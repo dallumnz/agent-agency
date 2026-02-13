@@ -1,7 +1,7 @@
 ---
 description: Code review agent that performs static analysis, identifies security concerns, and checks style compliance for Laravel code.
 mode: subagent
-model: lmstudio/openai/gpt-oss-20b
+model: opencode/kimi-k2.5
 temperature: 0.3
 tools:
   Read: true
