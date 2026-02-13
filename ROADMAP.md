@@ -73,20 +73,9 @@ v0.6.0  Next iteration
 | Dev-Manager | Orchestrator | gpt-oss-20b (local) | ✅ Working |
 | Senior-Architect | System Design | gpt-oss-20b (local) | ✅ Working |
 | Fullstack-Dev | Implementation | kimi-k2.5 (API) | ✅ Working |
-| Code-Reviewer | Quality | gpt-oss-20b (local) | ✅ Working |
+| Code-Reviewer | Quality | kimi-k2.5 (API) | ✅ Working |
 
-### Milestone 5: Integration Testing ✅
-
-**Status:** Completed
-
-- [x] Blog posts CRUD
-- [x] Contact form feature
-- [x] Newsletter post type
-- [x] Analytics middleware
-- [x] Sitemap feature
-- [x] RSS feed
-
-### Milestone 6: Next (v0.6.0)
+### Milestone 5: Next (v0.6.0)
 
 **Status:** Planning
 
@@ -136,10 +125,10 @@ v0.6.0  Next iteration
 
 | Metric | Target | Actual |
 |--------|--------|--------|
-| Workflow completion | 100% | In progress |
-| Architecture written | 100% | Enforced |
-| Code reviews filed | 100% | File-based |
-| Handoff generated | 100% | Bash-based |
+| Workflow completion | 100% | ✅ Validated |
+| Architecture written | 100% | ✅ Enforced |
+| Code reviews filed | 100% | ✅ File-based |
+| Handoff generated | 100% | ✅ Bash-based |
 
 ---
 
