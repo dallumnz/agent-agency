@@ -15,7 +15,11 @@ echo "📋 Copying agents..."
 mkdir -p "$OPENCODE_DIR/agents"
 cp "$SCRIPT_DIR/.opencode/agents/"*.md "$OPENCODE_DIR/agents/"
 
-# Copy contexts (preserve subdirectory structure)
+# Copy scripts
+echo "🔧 Copying scripts..."
+mkdir -p "$OPENCODE_DIR/scripts"
+cp "$SCRIPT_DIR/.opencode/scripts/"* "$OPENCODE_DIR/scripts/"
+chmod +x "$OPENCODE_DIR/scripts/"*.sh 2>/dev/null || true
 echo "📚 Copying contexts..."
 mkdir -p "$OPENCODE_DIR/contexts"
 cp "$SCRIPT_DIR/contexts/"*.md "$OPENCODE_DIR/contexts/"
