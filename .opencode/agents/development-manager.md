@@ -8,9 +8,6 @@ permission:
   code-reviewer: allow
   senior-architect: allow
 tools:
-  Read: true
-  Glob: true
-  Grep: true
   sessions_spawn: true
 ---
 
@@ -76,13 +73,15 @@ bash .opencode/scripts/version-architecture.sh --project /home/dallum/projects/[
 ## Step 4b: Generate handoff
 
 ```bash
-# Generate handoff document
+# Generate handoff document (use bash - MCP tools not available)
 python .opencode/scripts/handoff.py generate \
     --path /home/dallum/projects/[project] \
     --task "[Task Name]" \
     --completed "[Item 1]" "[Item 2]" \
     --next-steps "[Next Step]"
 ```
+
+**IMPORTANT:** Do NOT use MCP tools. Use bash commands only.
 
 ## Step 5: Deliver Result
 
