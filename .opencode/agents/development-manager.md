@@ -70,7 +70,7 @@ For ANY feature request, **always delegate to @senior-architect first** to handl
 
 ```bash
 # Snapshot architecture (if changed)
-bash .opencode/scripts/version-architecture.sh
+bash .opencode/scripts/version-architecture.sh --project /home/dallum/projects/[project]
 ```
 
 ## Step 4b: Generate handoff
