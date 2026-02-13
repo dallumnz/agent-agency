@@ -145,7 +145,8 @@ def generate_handoff(
     if output_file is None:
         output_dir = path / DEFAULT_OUTPUT_DIR
         output_dir.mkdir(exist_ok=True)
-        output_file = output_dir / f"HANDOFF_{date_only}.md"
+        timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d_%H%M")
+        output_file = output_dir / f"HANDOFF_{timestamp}.md"
     
     # Collect git info
     git_info = {}
